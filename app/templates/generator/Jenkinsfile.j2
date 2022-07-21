@@ -1,0 +1,113 @@
+def cloud = "kubernetes"
+
+def project             = "{{ project }}"
+def name                = "{{ name }}"
+def fullName            = "{{ project }}/${name}"
+def dockerfile          = "{{ dockerfile }}"
+
+def registry            = "{{ registry }}"
+def registryUrl         = "https://${registry}"
+def targetClusters      = "${targetClusterList}".split(',')    // BuildWithParameter 에서 정의됨
+def deployable_branches = [{{ deployable_branches|safe }}]
+
+def label               = "${name}-${UUID.randomUUID().toString().toLowerCase()}"
+def argocdServer        = "${argocdServer}"    // BuildWithParameter 에서 정의됨
+def appWaitTimeout      = 600
+def imageTag            = ""
+def imageAlias          = ""
+
+def BRANCH_TAG_MAP = [
+  "develop":"develop",
+  "release/qa":"qa",
+  "stg":"stg",
+  "staging":"stg",
+  "release/stg":"stg",
+  "release/staging":"stg",
+  "master":"prod",
+  "main":"prod"
+]
+
+podTemplate(
+    cloud: cloud,
+    label: label,
+    imagePullSecrets: ["{{ secretName }}"],
+    containers: [
+        containerTemplate(
+            name: "docker",
+            image: "docker:17.09",
+            ttyEnabled: true,
+            command: "cat",
+            args: ""
+        ),
+        containerTemplate(
+            name: "argocd",
+            image: "wregistry.wemakeprice.com/infracm/argo-cd-cli:v1.7.2",
+            ttyEnabled: true,
+            command: "cat",
+            args: ""
+        )
+    ],
+    volumes: [
+        hostPathVolume(
+          hostPath: "/var/run/docker.sock",
+          mountPath: "/var/run/docker.sock"
+        )
+    ]) {
+
+    node(label) {
+        def scmInfo = checkout scm
+        def gitCommit = scmInfo.GIT_COMMIT.substring(0, 7)
+        imageTag = gitCommit
+        def branch = scmInfo.GIT_BRANCH.replaceAll("origin/", "")
+
+        if (BRANCH_TAG_MAP.containsKey(branch)) {
+          imageAlias = BRANCH_TAG_MAP[branch]
+        }
+
+        // exit gracefully if not the deployable branches
+        if (!deployable_branches.contains(branch)) {
+            stage("Skipping pipeline") {
+                println "Branch: ${branch} is not part of deployable_branches"
+                println "Skipping pipeline"
+            }
+            currentBuild.result = "SUCCESS"
+            return
+        }
+
+        stage("Docker image Build & Push") {
+            container('docker') {
+                withDockerRegistry([credentialsId: "devinfracmconreg-cred", url: "${registryUrl}"]) {
+                    sh "docker build --network=host -f $dockerfile -t $registry/$fullName:$gitCommit ."
+                    docker.image("$registry/$fullName:$gitCommit").push()
+                    if (imageAlias != "") {
+                      sh "docker tag $registry/$fullName:$gitCommit $registry/$fullName:$imageAlias"
+                      docker.image("$registry/$fullName:$imageAlias").push()
+                    }
+                }
+            }
+        }
+
+        stage("Deploying ${name}") {
+            container('argocd') {
+                withCredentials([
+                  usernamePassword(
+                    credentialsId: "argocd-account",
+                    usernameVariable: "ARGOCD_USERNAME",
+                    passwordVariable: "ARGOCD_PASSWORD"
+                  )
+                ]) {
+                  // permanent token 을 발급할 수 없는 argocd 인스턴스가 있음
+                  // token 에 expires 가 +1d 로 설정되기에 매번 토큰을 발급받아서 처리함
+                  // sh 명령에 sensitive string 이 포함된 경우에는 double quote 대신에 single quote 를 사용
+                  // https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#string-interpolation
+                  sh '/argocd login ${argocdServer} --username ${ARGOCD_USERNAME} --password ${ARGOCD_PASSWORD}'
+                  def options = "--insecure --server ${argocdServer}"
+                  for (int i = 0; i < targetClusters.size(); i++) {
+                      def appName = "${project}-${name}-${targetClusters[i]}"
+                      sh "/argocd app set ${appName} ${options} --helm-set image.tag=${imageTag}"
+                  }
+                }
+            }
+        }
+    }
+}

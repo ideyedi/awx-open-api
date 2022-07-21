@@ -1,0 +1,59 @@
+{%- if starter == 'tomcat' -%}
+FROM gradle:jdk8 AS pinpoint
+WORKDIR /app
+ENV PINPOINT_VERSION={{ pinpoint.version }}
+RUN wget "https://github.com/naver/pinpoint/releases/download/v$PINPOINT_VERSION/pinpoint-agent-$PINPOINT_VERSION.tar.gz" \
+  && tar xfz pinpoint-agent-$PINPOINT_VERSION.tar.gz \
+  && rm -f pinpoint-agent-$PINPOINT_VERSION.tar.gz \
+  && mv pinpoint-agent-$PINPOINT_VERSION pinpoint-agent
+
+{% endif %}
+{%- if build.tool == "gradle" -%}
+FROM gradle:{{ gradle.version }} AS builder
+WORKDIR /app
+### FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
+COPY gradlew build.gradle settings.gradle ./
+### FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
+COPY gradle gradle
+RUN ./gradlew check --stacktrace -x test
+COPY {{ build.src }} {{ build.src }}
+RUN {{ build.command|default(gradle.build.command, true) }}
+{%- elif build.tool == "maven" -%}
+FROM maven:{{ maven.version }} AS builder
+WORKDIR /app
+COPY pom.xml settings.xml ./
+RUN mvn dependency:go-offline -s ./settings.xml -DskipTests=true
+COPY {{ build.src }} {{ build.src }}
+RUN {{ build.command|default(maven.build.command, true) }}
+{%- endif %}
+
+{% if starter == 'tomcat' -%}
+FROM tomcat:{{ tomcat.version }}
+RUN rm -rf $CATALINA_HOME/webapps/*
+
+COPY --from=builder /app/{{ build.artifact }} $CATALINA_HOME/webapps/ROOT.{{ 'jar' if build.artifact[-3] == 'j' else 'war' }}
+COPY --from=pinpoint /app/pinpoint-agent $CATALINA_HOME/pinpoint-agent
+{% else -%}
+FROM openjdk:8-alpine
+COPY --from=builder /app/{{ build.artifact }} /app/ROOT.war
+{% endif %}
+
+
+{%- if starter == 'tomcat' %}
+## PINPOINT_ENABLED 가 "true" 이면,
+## SPRING_PROFILES_ACTIVE 을 기준으로 pinpoint collector ip 를 설정
+ENV APPLICATION_NAME="{{ name }}" \
+  SPRING_PROFILES_ACTIVE=local \
+  PINPOINT_ENABLED="false"
+
+# overwrite tomcat config
+COPY misc/apache-tomcat/conf/server.xml $CATALINA_HOME/conf/server.xml
+COPY docker-entrypoint.sh /usr/local/bin/
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["catalina.sh", "run"]
+{% else %}
+ENV SPRING_PROFILES_ACTIVE=local
+
+CMD ["java", "-jar", "/app/ROOT.war"]
+{% endif -%}
+EXPOSE {{ expose }}

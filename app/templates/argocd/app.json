@@ -1,0 +1,32 @@
+{
+   "metadata":{
+      "name":"",
+      "namespace":"argocd",
+      "annotations":{
+         "recipients.argocd-notifications.argoproj.io":"webhook:ms-teams"
+      }
+   },
+   "spec":{
+      "source":{
+         "repoURL":"",
+         "path":"",
+         "targetRevision":"",
+         "helm":{
+            "valueFiles":[
+               "values.yaml",
+               "values-dev.yaml"
+            ]
+         }
+      },
+      "destination":{
+         "server":"",
+         "namespace":""
+      },
+      "project":"",
+      "syncPolicy":{
+         "automated":{
+            
+         }
+      }
+   }
+}

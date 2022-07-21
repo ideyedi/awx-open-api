@@ -1,0 +1,90 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.39">
+  <actions/>
+  <description>https://{{ name }}</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <jenkins.plugins.office365connector.WebhookJobProperty plugin="Office-365-Connector@4.13.2">
+      <webhooks>
+        <jenkins.plugins.office365connector.Webhook>
+          <name>ms-teams</name>
+          <url>https://wmp.webhook.office.com/webhookb2/5c455e73-ba57-4304-97d3-5633f44522ed@6322d5f5-2204-4e9d-9ca6-d18828a04daf/JenkinsCI/9492bfdfa23a42ed94dbac6384b8c127/c4e2ee34-449c-4644-abbf-3eb735121e8d</url>
+          <startNotification>true</startNotification>
+          <notifySuccess>true</notifySuccess>
+          <notifyAborted>true</notifyAborted>
+          <notifyNotBuilt>false</notifyNotBuilt>
+          <notifyUnstable>true</notifyUnstable>
+          <notifyFailure>true</notifyFailure>
+          <notifyBackToNormal>true</notifyBackToNormal>
+          <notifyRepeatedFailure>false</notifyRepeatedFailure>
+          <timeout>30000</timeout>
+          <macros class="empty-list"/>
+          <factDefinitions class="empty-list"/>
+        </jenkins.plugins.office365connector.Webhook>
+      </webhooks>
+    </jenkins.plugins.office365connector.WebhookJobProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>argocdServer</name>
+          <description></description>
+          <defaultValue>{{ argocdServer }}</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>targetClusterList</name>
+          <description></description>
+          <defaultValue>"{{ targets | join(',') | replace(',','","') }}"</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+    <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+      <triggers>
+        <org.jenkinsci.plugins.gwt.GenericTrigger plugin="generic-webhook-trigger@1.67">
+          <spec></spec>
+          <genericVariables>
+            <org.jenkinsci.plugins.gwt.GenericVariable>
+              <expressionType>JSONPath</expressionType>
+              <key>branch</key>
+              <value>$.changes[0].ref.displayId</value>
+              <regexpFilter></regexpFilter>
+              <defaultValue></defaultValue>
+            </org.jenkinsci.plugins.gwt.GenericVariable>
+          </genericVariables>
+          <regexpFilterText>$branch</regexpFilterText>
+          <regexpFilterExpression>^{{ branch }}$</regexpFilterExpression>
+          <printPostContent>false</printPostContent>
+          <printContributedVariables>false</printContributedVariables>
+          <causeString>Generic Cause</causeString>
+          <token>{{ project }}-{{ name }}</token>
+          <silentResponse>false</silentResponse>
+          <overrideQuietPeriod>false</overrideQuietPeriod>
+        </org.jenkinsci.plugins.gwt.GenericTrigger>
+      </triggers>
+    </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition" plugin="workflow-cps@2.82">
+    <scm class="hudson.plugins.git.GitSCM" plugin="git@4.4.0">
+      <configVersion>2</configVersion>
+      <userRemoteConfigs>
+        <hudson.plugins.git.UserRemoteConfig>
+          <url>{{ repo }}</url>
+          <credentialsId>se_team_at_bitbucket.wemakeprice.com</credentialsId>
+        </hudson.plugins.git.UserRemoteConfig>
+      </userRemoteConfigs>
+      <branches>
+        <hudson.plugins.git.BranchSpec>
+          <name>*/{{ branch }}</name>
+        </hudson.plugins.git.BranchSpec>
+      </branches>
+      <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+      <submoduleCfg class="list"/>
+      <extensions/>
+    </scm>
+    <scriptPath>{{ script }}</scriptPath>
+    <lightweight>true</lightweight>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>

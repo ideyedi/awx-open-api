@@ -1,0 +1,80 @@
+---
+# wmp-spring-app/values/{{ project }}/{{ service }}/values-{{ env }}.yaml
+
+replicaCount: {{ replicaCount }}
+
+image:
+  repository: {{ image.url }}/{{ project }}/{{ service }}
+  pullPolicy: Always
+  tag: {{ image.tag }}
+
+imagePullSecrets:
+  {%- for secretName in image.imagePullSecrets %}
+  - name: {{ secretName }}
+  {%- endfor %}
+
+{%- if env == 'dev' %}
+hostAliases:
+  # http://jira.wemakeprice.com/browse/SYS-7515
+  # 위 이슈가 해결되면 필요없음
+  # dev 환경의 KAFKA_APPENDER 를 사용하면 DNS ACL 에 의해 IDC 외부망 에서는 응답이 없음
+  # dev 환경에서는 아래 설정이 필요함
+  - ip: 10.107.0.7
+    hostnames:
+      - nd-log-mq.dev.wemakeprice.com
+{%- endif %}
+
+ingress:
+  enabled: {{ ingress.enabled|lower }}
+  annotations:
+    kubernetes.io/ingress.class: {{ ingress.klass }}
+  hosts:
+    {%- for host in ingress.hosts %}
+    - host: {{ host }}
+      paths: ["/"]
+    {%- endfor %}
+  tls:
+    {%- for tls in ingress.tls %}
+    - secretName: {{ tls.secretName }}
+      hosts:
+        {%- for host in ingress.hosts %}
+        - {{ host }}
+        {%- endfor %}
+    {%- endfor %}
+
+spring:
+  profiles:
+    active: {{ env }}
+  env:
+    CATALINA_OPTS: "{{ spring.opts }}"
+
+pinpoint:
+  enabled: {{ pinpoint.enabled|lower }}
+
+bigip:
+  enabled: {{ bigip.enabled|lower }}
+  environment: {{ bigip.environment }}
+  hostname: {{ bigip.hostname }}
+  nodeNamePattern:{{ '' if bigip.nodeNamePatterns|length else ' []' }}
+    {%- for pattern in bigip.nodeNamePatterns %}
+    - {{ pattern }}
+    {%- endfor %}
+
+healthcheck:
+  enabled: {{ healthcheck.enabled|lower }}
+  path: {{ healthcheck.path }}
+  initialDelaySeconds: {{ healthcheck.initialDelaySeconds }}
+  timeoutSeconds: {{ healthcheck.timeoutSeconds }}
+  failureThreshold: {{ healthcheck.failureThreshold }}
+
+service:
+  type: ClusterIP
+  port: 8080
+
+resources:
+  limits:
+    cpu: {{ resources.limits.cpu }}
+    memory: {{ resources.limits.memory }}
+  requests:
+    cpu: {{ resources.requests.cpu }}
+    memory: {{ resources.requests.memory }}

@@ -1,0 +1,44 @@
+{% raw -%}
+#!/bin/bash
+set -e
+if [ "$PINPOINT_ENABLED" == "true" ]; then
+    case $SPRING_PROFILES_ACTIVE in
+        dev)
+            PINPOINT_COLLECTOR_IP="pinpoint-collector.wemake-dev.com"
+            PINPOINT_PROFILER_SAMPLING_RATE=1
+            ;;
+        qa)
+            PINPOINT_COLLECTOR_IP="pinpoint-collector.wemake-qa.com"
+            PINPOINT_PROFILER_SAMPLING_RATE=1
+            ;;
+        stg)
+            PINPOINT_COLLECTOR_IP="pinpoint-collector.wemake-stg.com"
+            PINPOINT_PROFILER_SAMPLING_RATE=1
+            ;;
+        prod)
+            PINPOINT_COLLECTOR_IP="pinpoint-collector.wemakeprice.com"
+            PINPOINT_PROFILER_SAMPLING_RATE=20
+            ;;
+        *)
+            echo "Unkown spring profile: $SPRING_PROFILES_ACTIVE"
+            PINPOINT_ENABLED="false"
+            ;;
+    esac
+fi
+
+if [ "$PINPOINT_ENABLED" == "true" ]; then
+    PINPOINT_AGENT_ID="${HOSTNAME}"
+    if [ "${#HOSTNAME}" -gt 24 ]; then
+        PINPOINT_AGENT_ID="${HOSTNAME: (-24)}"
+    fi
+    PINPOINT_AGENT_PATH=$CATALINA_HOME/pinpoint-agent
+    CATALINA_OPTS="$CATALINA_OPTS -javaagent:$PINPOINT_AGENT_PATH/pinpoint-bootstrap.jar"
+    CATALINA_OPTS="$CATALINA_OPTS -Dpinpoint.agentId=$PINPOINT_AGENT_ID"
+    export CATALINA_OPTS="$CATALINA_OPTS -Dpinpoint.applicationName=$APPLICATION_NAME"
+
+    sed -i "s#profiler.transport.grpc.collector.ip=127.0.0.1#profiler.transport.grpc.collector.ip=$PINPOINT_COLLECTOR_IP#" $PINPOINT_AGENT_PATH/profiles/release/pinpoint-env.config
+    sed -i "s#profiler.sampling.rate=20#profiler.sampling.rate=$PINPOINT_PROFILER_SAMPLING_RATE#" $PINPOINT_AGENT_PATH/profiles/release/pinpoint-env.config
+fi
+
+exec "$@"
+{%- endraw %}

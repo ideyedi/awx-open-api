@@ -1,0 +1,266 @@
+{
+  "eventKey": "pr:merged",
+  "date": "2021-05-26T14:32:35+0900",
+  "actor": {
+    "name": "hshong",
+    "emailAddress": "hshong@wemakeprice.com",
+    "id": 2010,
+    "displayName": "홍형석",
+    "active": true,
+    "slug": "hshong",
+    "type": "NORMAL",
+    "links": {
+      "self": [{ "href": "https://stash.wemakeprice.com/users/hshong" }]
+    }
+  },
+  "pullRequest": {
+    "id": 2,
+    "version": 2,
+    "title": "[infcm/deal-api] (dev) 컨테이너 환경에서 사용될 CI/CD 메타 파일 추가",
+    "description": "이 PR 은 자동으로 생성되었습니다.\n\nWMP 의 Kubernetes 플랫폼에서 운영하기 위한 필수 CI/CD 메타파일을 추가하였습니다.",
+    "state": "MERGED",
+    "open": false,
+    "closed": true,
+    "createdDate": 1622007109300,
+    "updatedDate": 1622007155432,
+    "closedDate": 1622007155432,
+    "fromRef": {
+      "id": "refs/heads/dockerize-dev-by-infracm-2021-05-26T053143",
+      "displayId": "dockerize-dev-by-infracm-2021-05-26T053143",
+      "latestCommit": "5e7839228488fc2a8d089ba1bf6322455b87bebd",
+      "repository": {
+        "slug": "deal-api",
+        "id": 3123,
+        "name": "deal-api",
+        "description": "[Product Engineer Team] 상품 백엔드 API",
+        "scmId": "git",
+        "state": "AVAILABLE",
+        "statusMessage": "Available",
+        "forkable": true,
+        "origin": {
+          "slug": "deal-api",
+          "id": 715,
+          "name": "deal-api",
+          "description": "[Product Engineer Team] 상품 백엔드 API",
+          "scmId": "git",
+          "state": "AVAILABLE",
+          "statusMessage": "Available",
+          "forkable": true,
+          "project": {
+            "key": "WONDER",
+            "id": 262,
+            "name": "WONDER",
+            "description": "위메프 (배송2.0)",
+            "public": false,
+            "type": "NORMAL",
+            "links": {
+              "self": [
+                { "href": "https://stash.wemakeprice.com/projects/WONDER" }
+              ]
+            }
+          },
+          "public": false,
+          "links": {
+            "clone": [
+              {
+                "href": "https://stash.wemakeprice.com/scm/wonder/deal-api.git",
+                "name": "http"
+              },
+              {
+                "href": "ssh://git@stash.wemakeprice.com:7999/wonder/deal-api.git",
+                "name": "ssh"
+              }
+            ],
+            "self": [
+              {
+                "href": "https://stash.wemakeprice.com/projects/WONDER/repos/deal-api/browse"
+              }
+            ]
+          }
+        },
+        "project": {
+          "key": "INFCM",
+          "id": 963,
+          "name": "InfraCM TF",
+          "description": "infraCM tf",
+          "public": false,
+          "type": "NORMAL",
+          "links": {
+            "self": [{ "href": "https://stash.wemakeprice.com/projects/INFCM" }]
+          }
+        },
+        "public": false,
+        "links": {
+          "clone": [
+            {
+              "href": "ssh://git@stash.wemakeprice.com:7999/infcm/deal-api.git",
+              "name": "ssh"
+            },
+            {
+              "href": "https://stash.wemakeprice.com/scm/infcm/deal-api.git",
+              "name": "http"
+            }
+          ],
+          "self": [
+            {
+              "href": "https://stash.wemakeprice.com/projects/INFCM/repos/deal-api/browse"
+            }
+          ]
+        }
+      }
+    },
+    "toRef": {
+      "id": "refs/heads/master",
+      "displayId": "master",
+      "latestCommit": "45ec35301e61aad338874fb45528103b3480441c",
+      "repository": {
+        "slug": "deal-api",
+        "id": 3123,
+        "name": "deal-api",
+        "description": "[Product Engineer Team] 상품 백엔드 API",
+        "scmId": "git",
+        "state": "AVAILABLE",
+        "statusMessage": "Available",
+        "forkable": true,
+        "origin": {
+          "slug": "deal-api",
+          "id": 715,
+          "name": "deal-api",
+          "description": "[Product Engineer Team] 상품 백엔드 API",
+          "scmId": "git",
+          "state": "AVAILABLE",
+          "statusMessage": "Available",
+          "forkable": true,
+          "project": {
+            "key": "WONDER",
+            "id": 262,
+            "name": "WONDER",
+            "description": "위메프 (배송2.0)",
+            "public": false,
+            "type": "NORMAL",
+            "links": {
+              "self": [
+                { "href": "https://stash.wemakeprice.com/projects/WONDER" }
+              ]
+            }
+          },
+          "public": false,
+          "links": {
+            "clone": [
+              {
+                "href": "https://stash.wemakeprice.com/scm/wonder/deal-api.git",
+                "name": "http"
+              },
+              {
+                "href": "ssh://git@stash.wemakeprice.com:7999/wonder/deal-api.git",
+                "name": "ssh"
+              }
+            ],
+            "self": [
+              {
+                "href": "https://stash.wemakeprice.com/projects/WONDER/repos/deal-api/browse"
+              }
+            ]
+          }
+        },
+        "project": {
+          "key": "INFCM",
+          "id": 963,
+          "name": "InfraCM TF",
+          "description": "infraCM tf",
+          "public": false,
+          "type": "NORMAL",
+          "links": {
+            "self": [{ "href": "https://stash.wemakeprice.com/projects/INFCM" }]
+          }
+        },
+        "public": false,
+        "links": {
+          "clone": [
+            {
+              "href": "ssh://git@stash.wemakeprice.com:7999/infcm/deal-api.git",
+              "name": "ssh"
+            },
+            {
+              "href": "https://stash.wemakeprice.com/scm/infcm/deal-api.git",
+              "name": "http"
+            }
+          ],
+          "self": [
+            {
+              "href": "https://stash.wemakeprice.com/projects/INFCM/repos/deal-api/browse"
+            }
+          ]
+        }
+      }
+    },
+    "locked": false,
+    "author": {
+      "user": {
+        "name": "ci_infracm",
+        "emailAddress": "ci_infracm@wemakeprice.com",
+        "id": 3279,
+        "displayName": "InfraCM TF",
+        "active": true,
+        "slug": "ci_infracm",
+        "type": "NORMAL",
+        "links": {
+          "self": [{ "href": "https://stash.wemakeprice.com/users/ci_infracm" }]
+        }
+      },
+      "role": "AUTHOR",
+      "approved": false,
+      "status": "UNAPPROVED"
+    },
+    "reviewers": [
+      {
+        "user": {
+          "name": "hshong",
+          "emailAddress": "hshong@wemakeprice.com",
+          "id": 2010,
+          "displayName": "홍형석",
+          "active": true,
+          "slug": "hshong",
+          "type": "NORMAL",
+          "links": {
+            "self": [{ "href": "https://stash.wemakeprice.com/users/hshong" }]
+          }
+        },
+        "role": "REVIEWER",
+        "approved": false,
+        "status": "UNAPPROVED"
+      },
+      {
+        "user": {
+          "name": "whisker1",
+          "emailAddress": "whisker1@wemakeprice.com",
+          "id": 2055,
+          "displayName": "김대현",
+          "active": true,
+          "slug": "whisker1",
+          "type": "NORMAL",
+          "links": {
+            "self": [{ "href": "https://stash.wemakeprice.com/users/whisker1" }]
+          }
+        },
+        "role": "REVIEWER",
+        "approved": false,
+        "status": "UNAPPROVED"
+      }
+    ],
+    "participants": [],
+    "properties": {
+      "mergeCommit": {
+        "displayId": "93044342a7d",
+        "id": "93044342a7d0ab6e676b06cd47a0fe52d326580d"
+      }
+    },
+    "links": {
+      "self": [
+        {
+          "href": "https://stash.wemakeprice.com/projects/INFCM/repos/deal-api/pull-requests/2"
+        }
+      ]
+    }
+  }
+}
