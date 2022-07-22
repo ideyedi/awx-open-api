@@ -2,15 +2,15 @@
   "eventKey": "pr:merged",
   "date": "2021-05-26T14:32:35+0900",
   "actor": {
-    "name": "hshong",
+    "name": "esji",
     "emailAddress": "hshong@wemakeprice.com",
     "id": 2010,
-    "displayName": "홍형석",
+    "displayName": "지은석",
     "active": true,
-    "slug": "hshong",
+    "slug": "esji",
     "type": "NORMAL",
     "links": {
-      "self": [{ "href": "https://stash.wemakeprice.com/users/hshong" }]
+      "self": [{ "href": "https://stash.wemakeprice.com/users/esji" }]
     }
   },
   "pullRequest": {
