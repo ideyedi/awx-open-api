@@ -51,30 +51,30 @@ DEV_INFRACM_REGISTRY_SECRET_NAME = "devinfracmconreg"
 class Settings(BaseSettings):
     region: Optional[REGIONS] = "dev"
 
-    bigip_enabled: str
-    bigip_host: str
-    bigip_username: str
-    bigip_password: str
-    bigip_snatpool: str
+    #bigip_enabled: str
+    #bigip_host: str
+    #bigip_username: str
+    #bigip_password: str
+    #bigip_snatpool: str
 
-    jenkins_host: str
-    jenkins_username: str
-    jenkins_token: str
+    #jenkins_host: str
+    #jenkins_username: str
+    #jenkins_token: str
 
-    argocd_host: str
-    argocd_grpc_host: str
-    # deprecated
-    argocd_token: str
-    argocd_username: str
-    argocd_password: str
+    #argocd_host: str
+    #argocd_grpc_host: str
+    ## deprecated
+    #argocd_token: str
+    #argocd_username: str
+    #argocd_password: str
 
-    rancher_host: str
-    helm_repo: str
+    #rancher_host: str
+    #helm_repo: str
 
-    db_host: str
-    db_user: str
-    db_password: str
-    db_name: str
+    #db_host: str
+    #db_user: str
+    #db_password: str
+    #db_name: str
 
     db_trace: Optional[int] = 0
 
@@ -84,17 +84,17 @@ class Settings(BaseSettings):
     # dev 환경의 wait_timeout: 28800.
     pool_recycle: Optional[int] = 14400
 
-    bitbucket_token: str
-    bitbucket_username: str
-    bitbucket_password: str
-    bitbucket_default_reviewer: str  # comma seperated
+    #bitbucket_token: str
+    #bitbucket_username: str
+    #bitbucket_password: str
+    #bitbucket_default_reviewer: str  # comma seperated
 
-    harbor_username: str
-    harbor_password: str
+    #harbor_username: str
+    #harbor_password: str
 
-    pipeline_webhook: str
+    #pipeline_webhook: str
 
-    cors_allow_origins: str
+    #cors_allow_origins: str
 
     class Config:
         env_file = ".env"
@@ -102,3 +102,4 @@ class Settings(BaseSettings):
 
 def get_settings():
     return Settings()
+
