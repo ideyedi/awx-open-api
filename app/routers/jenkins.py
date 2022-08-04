@@ -25,3 +25,10 @@ def remove_job(self, project: str, name: str):
         raise_error(500, f"Failed to remove jenkins job: {project}/{name}")
 
     return {"removed": "OK"}
+
+
+@router.get('/jobs', response_class=PlainTextResponse)
+def account():
+    ret: int = 0
+    return ret
+
