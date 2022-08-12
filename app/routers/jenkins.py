@@ -23,7 +23,7 @@ def account(profile, account_id: str, account_name: str, account_email: str):
 
     ret = requests.post(url, auth=("esji", "01eff24aa80f35ba589c3901c292064c"), data=account_data, timeout=5)
     print(f'{ret}')
-    return "OK"
+    return str(ret.status_code)
 
 
 '''
