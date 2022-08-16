@@ -1,0 +1,18 @@
+dev:
+  url: http://jenkins.dev.wemakeprice.com
+  api_id: esji
+  api_token: 01eff24aa80f35ba589c3901c292064c
+
+qa:
+  url: http://jenkins.qa.wemakeprice.com
+
+stg:
+  url: http://jenkins.stg.wemakeprice.com
+
+prod:
+  url: http://jenkins.batch.wemakeprice.com
+  api_id: esji
+  api_token: bc47fb50d83dd8ef94b81c086ac730a7
+
+pre-prod:
+  url: http://jenkins.pre-prod.wemakeprice.com

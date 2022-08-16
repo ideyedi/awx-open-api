@@ -1,9 +1,11 @@
-import logging
 from requests import Session
 from requests.exceptions import HTTPError
 from fastapi.templating import Jinja2Templates
 from ..config import get_settings
 from ..models.params import JenkinsJobParams
+
+import logging
+import yaml
 
 templates = Jinja2Templates(directory="app/templates")
 
@@ -284,3 +286,17 @@ class JenkinsAgent:
         except (HTTPError, Exception) as error:
             logging.error(f"Failed to perform build: {error}")
             return ""
+
+
+class JenkinsInfo:
+    def __init__(self, profile: str):
+        self.env = profile
+
+        with open("app/keys/jenkins_url.yaml") as f:
+            jenkins_infos = yaml.load(f, Loader=yaml.FullLoader)
+
+        #print(f"{jenkins_infos[profile]}")
+        self.url = jenkins_infos[profile]['url']
+        self.api_id = jenkins_infos[profile]['api_id']
+        self.api_token = jenkins_infos[profile]['api_token']
+
