@@ -13,8 +13,8 @@ router = APIRouter(prefix="/jenkins", tags=["Jenkins"])
 agent = JenkinsAgent()
 
 
-@router.post('/jobs', response_class=PlainTextResponse)
-def account(profile, account_id: str, account_name: str, account_email: str):
+@router.post('/account', response_class=PlainTextResponse)
+def create_user(profile, account_id: str, account_name: str, account_email: str):
     profile_info = JenkinsInfo(profile)
     domain = profile_info.url
     api_url = domain + "/job/MAINTENANCE/job/wd_user/buildWithParameters"
@@ -28,6 +28,11 @@ def account(profile, account_id: str, account_name: str, account_email: str):
     print(f'{ret}')
 
     return str(ret.status_code)
+
+
+@router.get('/account', response_class=PlainTextResponse)
+def show_user(profile: str):
+    return "OK"
 
 
 @router.get('/test', response_class=PlainTextResponse)
