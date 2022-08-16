@@ -2,10 +2,12 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import PlainTextResponse
 
 from ..models.params import JenkinsJobParams
-from ..services.jenkins import JenkinsAgent
+from ..services.jenkins import (JenkinsAgent,
+                                JenkinsInfo, )
 from ..errors import raise_error
 
 import requests
+import yaml
 
 router = APIRouter(prefix="/jenkins", tags=["Jenkins"])
 agent = JenkinsAgent()
@@ -13,17 +15,27 @@ agent = JenkinsAgent()
 
 @router.post('/jobs', response_class=PlainTextResponse)
 def account(profile, account_id: str, account_name: str, account_email: str):
-    domain = "http://jenkins.dev.wemakeprice.com"
-    url = domain + "/job/MAINTENANCE/job/wd_user/buildWithParameters"
+    profile_info = JenkinsInfo(profile)
+    domain = profile_info.url
+    api_url = domain + "/job/MAINTENANCE/job/wd_user/buildWithParameters"
     account_data = {
         'account_id': account_id,
         'account_name': account_name,
         'account_email': account_email
     }
 
-    ret = requests.post(url, auth=("esji", "01eff24aa80f35ba589c3901c292064c"), data=account_data, timeout=5)
+    ret = requests.post(api_url, auth=(profile_info.api_id, profile_info.api_token), data=account_data, timeout=5)
     print(f'{ret}')
+
     return str(ret.status_code)
+
+
+@router.get('/test', response_class=PlainTextResponse)
+def test(profile):
+    profile_info = JenkinsInfo(profile)
+
+    print(f' ENV : {profile_info.env}')
+    return "OK"
 
 
 '''
