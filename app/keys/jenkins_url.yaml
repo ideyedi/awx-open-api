@@ -1,3 +1,5 @@
+---
+# batch Jenkins-info
 dev:
   url: http://jenkins.dev.wemakeprice.com
   api_id: esji
@@ -16,3 +18,9 @@ prod:
 
 pre-prod:
   url: http://jenkins.pre-prod.wemakeprice.com
+
+# wdeploy-info
+wdev:
+  url: http://wdeploy.wemakeprice.kr
+  api_id: esji
+  api_token: 11f60427043f5fe5e84b3d595687804e25
