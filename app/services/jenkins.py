@@ -4,8 +4,10 @@ from fastapi.templating import Jinja2Templates
 from ..config import get_settings
 from ..models.params import JenkinsJobParams
 
+import requests
 import logging
 import yaml
+import ast
 
 templates = Jinja2Templates(directory="app/templates")
 
@@ -299,4 +301,12 @@ class JenkinsInfo:
         self.url = jenkins_infos[profile]['url']
         self.api_id = jenkins_infos[profile]['api_id']
         self.api_token = jenkins_infos[profile]['api_token']
+
+    def check_csrf_crumb(self) -> dict:
+        crumb_domain = self.url + "/crumbIssuer/api/json"
+
+        ret = requests.get(crumb_domain, auth=(self.api_id, self.api_token))
+        print(f'Domain: {crumb_domain}, result: {ret}')
+
+        return ast.literal_eval(ret.content.decode('UTF-8'))
 

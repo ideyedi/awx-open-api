@@ -7,7 +7,7 @@ from ..services.jenkins import (JenkinsAgent,
 from ..errors import raise_error
 
 import requests
-import yaml
+import logging
 
 router = APIRouter(prefix="/jenkins", tags=["Jenkins"])
 agent = JenkinsAgent()
@@ -23,8 +23,14 @@ def create_user(profile, account_id: str, account_name: str, account_email: str)
         'account_name': account_name,
         'account_email': account_email
     }
+    crumb_key = profile_info.check_csrf_crumb()
+    headers = {crumb_key['crumbRequestField']: crumb_key['crumb']}
 
-    ret = requests.post(api_url, auth=(profile_info.api_id, profile_info.api_token), data=account_data, timeout=5)
+    ret = requests.post(api_url,
+                        auth=(profile_info.api_id, profile_info.api_token),
+                        data=account_data,
+                        timeout=5,
+                        headers=headers)
     print(f'{ret}')
 
     return str(ret.status_code)
@@ -38,8 +44,11 @@ def show_user(profile: str):
 @router.get('/test', response_class=PlainTextResponse)
 def test(profile):
     profile_info = JenkinsInfo(profile)
-
     print(f' ENV : {profile_info.env}')
+
+    ret = profile_info.check_csrf_crumb()
+    print(ret['crumb'])
+
     return "OK"
 
 
