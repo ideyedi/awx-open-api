@@ -1,4 +1,4 @@
-# sre-serving-api
+# sre-tower
 
 WMP Infrastructure Automation RESTful WEB API
 Made by FastAPI
@@ -13,15 +13,15 @@ Made by FastAPI
 
 ## Run
 
-    # http://localhost:8000/
-    $ uvicorn app.main:app --reload    # or ./run
+    # http://localhost:8080/
+    $ uvicorn app.main:app --port:8080 --reload    # or ./run
 
 ### Run as docker-compose
 
     # once
     $ docker volume create infracm-web-api-db-storage
 
-    # http://localhost:8000/
+    # http://localhost:8080/
     $ docker-compose up -d
 
     # database only; 0.0.0.0:3306
