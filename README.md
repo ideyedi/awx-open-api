@@ -1,6 +1,7 @@
-# sre-tower-api
+# sre-serving-api
 
 WMP Infrastructure Automation RESTful WEB API
+Made by FastAPI
 
 ## Prerequisites
 
