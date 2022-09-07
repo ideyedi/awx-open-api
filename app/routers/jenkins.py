@@ -1,9 +1,13 @@
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import (PlainTextResponse,
+                               Response,
+                               ORJSONResponse,
+                               )
 
 from ..models.params import JenkinsJobParams
 from ..services.jenkins import (JenkinsAgent,
-                                JenkinsInfo, )
+                                JenkinsInfo,
+                                )
 from ..errors import raise_error
 
 import requests
@@ -14,7 +18,7 @@ agent = JenkinsAgent()
 
 
 @router.post('/account', response_class=PlainTextResponse)
-def create_user(profile, account_id: str, account_name: str, account_email: str):
+def create_user(profile: str, account_id: str, account_name: str, account_email: str):
     profile_info = JenkinsInfo(profile)
     domain = profile_info.url
     api_url = domain + "/job/MAINTENANCE/job/wd_user/buildWithParameters"
@@ -42,7 +46,7 @@ def show_user(profile: str):
 
 
 @router.get('/test', response_class=PlainTextResponse)
-def test(profile):
+def test(profile: str):
     profile_info = JenkinsInfo(profile)
     print(f' ENV : {profile_info.env}')
 
@@ -50,6 +54,18 @@ def test(profile):
     print(ret['crumb'])
 
     return "OK"
+
+
+@router.get('/job')
+def check_jenkins_job(profile: str, job_url: str):
+
+    return 0
+
+
+@router.delete('/job')
+def delete_jeknins_job(profile, job_url: str):
+
+    return 0
 
 
 '''
