@@ -1,4 +1,4 @@
-# k8s-serving-api
+# sre-api
 
 WMP Infrastructure Automation RESTful WEB API
 
