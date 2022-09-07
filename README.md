@@ -1,4 +1,3 @@
-# web-api
 # k8s-serving-api
 
 WMP Infrastructure Automation RESTful WEB API
