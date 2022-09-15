@@ -57,6 +57,7 @@ zipp = "==3.4.0"
 fastapi = "==0.76.0"
 uvicorn = "==0.18.2"
 typing-extensions = "==4.3.0"
+docker-compose = "*"
 
 [dev-packages]
 pytest = "*"
