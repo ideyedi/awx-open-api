@@ -6,6 +6,7 @@ from .routers import (
     probes,
     generators,
     jenkins,
+    pinpoint,
 )
 #from .database import Base, engine
 from .ver import __version__ as version
@@ -35,6 +36,7 @@ app.add_middleware(
 app.include_router(probes.router)
 app.include_router(generators.router)
 app.include_router(jenkins.router)
+app.include_router(pinpoint.router)
 
 #app.include_router(webhooks.router)
 #app.include_router(pipelines.router)
