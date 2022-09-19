@@ -1,4 +1,4 @@
-# sre-api
+# sre-api (SRE : Site Reliability Engneering)
 
 WMP Infrastructure Automation RESTful WEB API
 
