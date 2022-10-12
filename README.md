@@ -2,7 +2,6 @@
 **Abstarct**  
 Docker based AWX 드롭다운 보이지 않는 문제로 인해 웹 크롤러를 이용  
 Inventory source를 생성하는 걸 목적으로 한다.
-
 ---
 **Environment**  
 Python 3.8.12  
