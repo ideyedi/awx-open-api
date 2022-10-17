@@ -7,6 +7,7 @@ from .routers import (
     generators,
     jenkins,
     pinpoint,
+    awx,
 )
 #from .database import Base, engine
 from .ver import __version__ as version
@@ -37,6 +38,7 @@ app.include_router(probes.router)
 app.include_router(generators.router)
 app.include_router(jenkins.router)
 app.include_router(pinpoint.router)
+app.include_router(awx.router)
 
 #app.include_router(webhooks.router)
 #app.include_router(pipelines.router)

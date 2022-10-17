@@ -103,15 +103,25 @@ class AnsibleCrawler:
             # print(f'{len(btn_project)}')
             btn_project[0].click()
 
+            # select project input에 awx_project 이름 넣기
+            project_wrapper = self.driver.find_elements(By.CLASS_NAME, 'pf-m-filter-group')
+            project_wrapper_input = project_wrapper[0].find_element(By.CSS_SELECTOR, "input[class='pf-c-form-control']")
+            project_wrapper_input.send_keys(self.project)
+
+            # select project 버튼 클릭
+            project_wrapper_btn = project_wrapper[0].find_elements(By.CSS_SELECTOR, "button[aria-label='Search submit button']")
+            project_wrapper_btn[0].click()
+            time.sleep(1)
+
             radio_projects = self.driver.find_elements(By.CLASS_NAME, 'pf-c-data-list__item-content')
-            # 프로젝트 선택을 파라미터에 따라 설정할 수 있는 방안을 확인해야 한다.
-            for item in radio_projects:
-                inner_text = item.text
-                print(inner_text)
-                if self.project in inner_text:
-                    radio_project = item
-            
-            radio_project.click()
+            # # 프로젝트 선택을 파라미터에 따라 설정할 수 있는 방안을 확인해야 한다.
+            # for item in radio_projects:
+            #     inner_text = item.text
+            #     print(inner_text)
+            #     if self.project in inner_text:
+            #         radio_project = item
+
+            radio_projects[0].click()
             btn_select = self.driver.find_elements(By.CLASS_NAME, 'pf-m-primary')
             # print(f'{len(btn_select)}')
             btn_select = btn_select[2]
