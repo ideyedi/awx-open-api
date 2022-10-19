@@ -179,5 +179,3 @@ class AnsibleCrawler:
             self.driver.quit()
             print('Quit crawling')
             return ret
-
-
