@@ -17,9 +17,13 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 
 class AnsibleCrawler:
-    def __init__(self, app_name: str, profile: str, project: str):
+    def __init__(self):
+        self.app_name = "nd-sre-api"
+        self.profile = "dev"
+        self.project = "es_migrate"
+
         # profile 값에 따라 AWX 서버 정보 변경
-        if profile == "prod":
+        if self.profile == "prod":
             self.target_url = "http://awx.wemakeprice.kr"
             self.inventory_index = 1
         else:
@@ -42,11 +46,7 @@ class AnsibleCrawler:
 
         self.logger = logging.getLogger()
         self.logger.setLevel(logging.INFO)
-        self.logger.info(f'crawler init (URL: {app_name}, profile: {profile})')
-
-        self.app_name = app_name
-        self.profile = profile
-        self.project = project
+        self.logger.info(f'crawler init (URL: {self.app_name}, profile: {self.profile})')
 
     def _awx_login(self):
         awx_id = 'jenkins'
