@@ -1,30 +1,35 @@
-### AWX Crawler
-**Abstarct**  
-Docker based AWX 드롭다운 보이지 않는 문제로 인해 웹 크롤러를 이용  
-Inventory source를 생성하는 걸 목적으로 한다.
----
-**Environment**  
-Python 3.8.12  
-Python virtual : pipenv
+## sre-crawler-api
+WMP Infrastructure Automation RESTful WEB API
 
-example  
-1. python 3.8.12 설치해야합니다.
-> python --version  
-> Python 3.8.12  
+### Prerequisites
 
-2. pipenv 구성
-> pip install pipenv
+    $ virtualenv venv
+    $ source venv/bin/activate
+    $ pip install -r requirements.txt
+    $ pre-commit install      # auto formatting
+    $ cp .env.example .env    # customize it!
 
-3. 가상환경 생성 (처음 생성할 경우 자동으로 실행됩니다.)
-> pipenv --python 3.8.12  
+### Run
 
-- 가상환경 실행, 종료  
-> pipenv shell  
-> exit
+    # http://localhost:8080/
+    $ uvicorn app.main:app --reload    # or ./run
 
-4. 가상환경에 패키지 설치
-> pipenv sync  
-> pip list
+#### Run as docker-compose
 
-5. 크롤러 실행
-> python make_inven.py
+    # once
+    $ docker volume create infracm-web-api-db-storage
+
+    # http://localhost:8000/
+    $ docker-compose up -d
+
+    # database only; 0.0.0.0:3306
+    $ docker-compose up -d db
+
+### Test
+
+    $ pytest                          # default WARN log level
+    $ pytest --log-cli-level DEBUG    # DEBUG|INFO|WARN|ERROR|CRITICAL
+
+### Code review
+docker-compose를 이용해서 DB 프로비저닝, harbor에 등록된 이미지를 이용해서 기본 셋업 구성
+docker file
