@@ -17,10 +17,10 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 
 class AnsibleCrawler:
-    def __init__(self):
-        self.app_name = "nd-sre-api"
-        self.profile = "dev"
-        self.project = "es_migrate"
+    def __init__(self, app_name, profile, awx_project):
+        self.app_name = app_name
+        self.profile = profile
+        self.project = awx_project
 
         # profile 값에 따라 AWX 서버 정보 변경
         if self.profile == "prod":
