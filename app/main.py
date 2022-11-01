@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.INFO)
 #Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="infracm/web-api",
+    title="sre-crawler-api",
     description="WMP Infrastructure Automation RESTful WEB API",
     version=f"v{version}",
     docs_url="/",
