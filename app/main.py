@@ -34,15 +34,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 '''
-app.include_router(probes.router)
-app.include_router(generators.router)
-app.include_router(jenkins.router)
 app.include_router(pinpoint.router)
 app.include_router(awx.router)
-
-#app.include_router(webhooks.router)
-#app.include_router(pipelines.router)
-#app.include_router(vipaddr.router)
-#app.include_router(argocd.router)
-#if configs.bigip_enabled == "true":
-#    app.include_router(bigip.router)
