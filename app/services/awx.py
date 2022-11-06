@@ -33,6 +33,7 @@ class AnsibleCrawler:
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('--incognito')
         chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--no-sandbox')
 
         # default 106으로 설정되어 있으나 Google S3상 해당 버전의 드라이버가 없는 모습
         # 105.0.5195.52 버전으로 명시
