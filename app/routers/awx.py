@@ -1,23 +1,21 @@
 from fastapi import APIRouter
 from fastapi.responses import (PlainTextResponse,)
-
-from ..services.awx import (AnsibleCrawler,
-                            )
-import logging
+from app.worker.tasks import (add,
+                              make_sourced_inventory
+                              )
 
 router = APIRouter(prefix="/awx", tags=["awx"])
 
 
 @router.post('/inventory/source', response_class=PlainTextResponse)
-def make_source(app_name, profile, awx_project):
-    ret = "OK"
-    crawler = AnsibleCrawler(app_name, profile, awx_project)
-    ret = crawler.make_inven()
-    return ret
+def make_source(app_name="nd-sre-api", profile="dev", project="develop"):
+    task = make_sourced_inventory.delay(app_name, profile, project)
+    print(f' Async object: task {task}')
+
+    return "OK"
 
 
-@router.post("/worker/test")
-def test():
-    logging.info(f'Celery Worker Test')
-
-    return 0
+@router.get('/test')
+def test(app_name="nd-sre-api", profile="dev", project="develop"):
+    task = make_sourced_inventory(app_name, profile, project)
+    return True
