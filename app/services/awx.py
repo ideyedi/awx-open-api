@@ -17,9 +17,13 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 
 class AnsibleCrawler:
-    def __init__(self, app_name: str, profile: str, project: str):
+    def __init__(self, app_name, profile, awx_project):
+        self.app_name = app_name
+        self.profile = profile
+        self.project = awx_project
+
         # profile 값에 따라 AWX 서버 정보 변경
-        if profile == "prod":
+        if self.profile == "prod":
             self.target_url = "http://awx.wemakeprice.kr"
             self.inventory_index = 1
         else:
@@ -29,6 +33,7 @@ class AnsibleCrawler:
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('--incognito')
         chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--no-sandbox')
 
         # default 106으로 설정되어 있으나 Google S3상 해당 버전의 드라이버가 없는 모습
         # 105.0.5195.52 버전으로 명시
@@ -42,11 +47,7 @@ class AnsibleCrawler:
 
         self.logger = logging.getLogger()
         self.logger.setLevel(logging.INFO)
-        self.logger.info(f'crawler init (URL: {app_name}, profile: {profile})')
-
-        self.app_name = app_name
-        self.profile = profile
-        self.project = project
+        self.logger.info(f'crawler init (URL: {self.app_name}, profile: {self.profile})')
 
     def _awx_login(self):
         awx_id = 'jenkins'
@@ -103,15 +104,25 @@ class AnsibleCrawler:
             # print(f'{len(btn_project)}')
             btn_project[0].click()
 
+            # select project input에 awx_project 이름 넣기
+            project_wrapper = self.driver.find_elements(By.CLASS_NAME, 'pf-m-filter-group')
+            project_wrapper_input = project_wrapper[0].find_element(By.CSS_SELECTOR, "input[class='pf-c-form-control']")
+            project_wrapper_input.send_keys(self.project)
+
+            # select project 버튼 클릭
+            project_wrapper_btn = project_wrapper[0].find_elements(By.CSS_SELECTOR, "button[aria-label='Search submit button']")
+            project_wrapper_btn[0].click()
+            time.sleep(1)
+
             radio_projects = self.driver.find_elements(By.CLASS_NAME, 'pf-c-data-list__item-content')
-            # 프로젝트 선택을 파라미터에 따라 설정할 수 있는 방안을 확인해야 한다.
-            for item in radio_projects:
-                inner_text = item.text
-                print(inner_text)
-                if self.project in inner_text:
-                    radio_project = item
-            
-            radio_project.click()
+            # # 프로젝트 선택을 파라미터에 따라 설정할 수 있는 방안을 확인해야 한다.
+            # for item in radio_projects:
+            #     inner_text = item.text
+            #     print(inner_text)
+            #     if self.project in inner_text:
+            #         radio_project = item
+
+            radio_projects[0].click()
             btn_select = self.driver.find_elements(By.CLASS_NAME, 'pf-m-primary')
             # print(f'{len(btn_select)}')
             btn_select = btn_select[2]
@@ -169,5 +180,3 @@ class AnsibleCrawler:
             self.driver.quit()
             print('Quit crawling')
             return ret
-
-
