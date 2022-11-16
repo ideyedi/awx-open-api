@@ -21,7 +21,3 @@ def make_sourced_inventory(app_name, profile, project):
     ret = crawler.make_inventory()
 
     return ret
-
-
-if __name__ == "__main__":
-    print(f'Test Code')

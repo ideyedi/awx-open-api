@@ -1,7 +1,7 @@
 from fastapi import APIRouter
-from fastapi.responses import (PlainTextResponse,)
-from app.worker.tasks import (add,
-                              make_sourced_inventory
+from fastapi.responses import (PlainTextResponse,
+                               )
+from app.worker.tasks import (make_sourced_inventory,
                               )
 
 router = APIRouter(prefix="/awx", tags=["awx"])
@@ -15,7 +15,8 @@ def make_source(app_name="nd-sre-api", profile="dev", project="develop"):
     return "OK"
 
 
-@router.get('/test')
+@router.post('/unittest/sync/source')
 def test(app_name="nd-sre-api", profile="dev", project="develop"):
     task = make_sourced_inventory(app_name, profile, project)
+    print(f' Sync api result: {task}')
     return True
