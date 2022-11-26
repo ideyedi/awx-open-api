@@ -15,6 +15,8 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
+from app.errors import raise_error
+
 
 class AnsibleCrawler:
     def __init__(self, app_name, profile, awx_project):
@@ -70,7 +72,7 @@ class AnsibleCrawler:
 
         return
 
-    def make_inven(self):
+    def make_inventory(self):
         """
         wemakeprice ansible inventory making
         :return:
