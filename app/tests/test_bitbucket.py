@@ -1,5 +1,5 @@
-from .bitbucket import PullRequest, WebHook
-from ..models.params import (
+from app.services.bitbucket import PullRequest, WebHook
+from app.models.params import (
     BitBucketPullRequestParams,
     BitBucketPullRequestBranchParams,
     BitbucketPullRequestPayload,

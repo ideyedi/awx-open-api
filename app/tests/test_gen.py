@@ -1,8 +1,8 @@
 import re
 import logging
 import shutil
-from .gen import gen_dockerfile, gen_jenkinsfile, gen_wmp_spring_app_chart
-from ..models.params import (
+from app.services.gen import gen_dockerfile, gen_jenkinsfile, gen_wmp_spring_app_chart
+from app.models.params import (
     DockerfileParams,
     DockerfileBuildOptions,
     JenkinsfileParams,

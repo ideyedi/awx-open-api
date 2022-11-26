@@ -3,10 +3,12 @@ from typing import Optional
 from typing_extensions import Literal
 
 REGIONS = Literal["dev", "qa", "stg", "prod"]
+
 BIGIP_ENV = Literal["development", "qa", "staging", "production"]
 TARGETS = Literal[
     "a-wmp-dev", "b-wmp-dev", "a-azure-dev", "b-azure-dev", "b-gcp-dev", "a-wmp-stg"
 ]
+
 ENV_BRANCH_MAP = {
     "dev": "develop",
     "qa": "release/qa",
@@ -25,6 +27,13 @@ ENV_TAG_MAP = {
     "stg": "stg",
     "prod": "prod",
 }
+
+AWX_URL_TUPLE = (
+    "http://awx-dev.wemakeprice.kr",
+    "http://awx-qa.wemakeprice.kr",
+    "http://awx-stg.wemakeprice.kr",
+    "http://awx.wemakeprice.kr",
+)
 
 ARGOCD_TARGET_REVISION_BY_REGION = {
     "dev": "develop",

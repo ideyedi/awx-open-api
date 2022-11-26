@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
-from ..main import app
-from ..models.params import (
+from app.main import app
+from app.models.params import (
     DockerfileBuildOptions,
     PipelineBuilderParams,
     PipelineBuilderDeployParams,

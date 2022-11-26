@@ -1,6 +1,6 @@
 import logging
-from .argocd import Argocd
-from ..models.params import ArgocdAppParams, ArgocdProjectParams
+from app.services.argocd import Argocd
+from app.models.params import ArgocdAppParams, ArgocdProjectParams
 
 argocd = Argocd()
 
