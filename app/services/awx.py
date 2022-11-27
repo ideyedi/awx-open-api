@@ -45,7 +45,7 @@ class AnsibleCrawler:
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'
         }
         self.session = requests.Session()
-        self.session.headers = self.headers
+        self.session.ㄷheaders = self.headers
 
         self.logger = logging.getLogger()
         self.logger.setLevel(logging.INFO)
