@@ -1,15 +1,20 @@
 import requests
 import logger
-from app.config import (AWX_URL_TUPLE,
-                        )
 
-from fastapi import APIRouter, status
-from fastapi.responses import (PlainTextResponse,
-                               )
-from app.worker.tasks import (make_sourced_inventory,
-                              )
-from app.errors import (raise_error,
+from typing import Optional
+from app.config import (AWX_URLS,
+                        OAUTH2_TOKENS,
+                        AWX_PROJECT_IDX,
                         )
+from app.models.awx import AwxInfo
+
+from fastapi import (APIRouter,
+                     status,
+                     HTTPException,
+                     )
+from fastapi.responses import PlainTextResponse
+from app.worker.tasks import make_sourced_inventory
+from app.services.awx import update_awx_project
 
 router = APIRouter(prefix="/awx", tags=["awx"])
 
@@ -28,7 +33,7 @@ def make_source(app_name: str, profile: str, project: str):
     return "OK"
 
 
-@router.post('/unittest/sync/source')
+#@router.post('/unittest/sync/source')
 def test(app_name="nd-sre-api", profile="dev", project="develop"):
     """
     Syncronize 동작을 확인하기 위한 테스트 함수
@@ -38,29 +43,39 @@ def test(app_name="nd-sre-api", profile="dev", project="develop"):
     return True
 
 
-@router.post('/project/update')
-def update_project():
+@router.patch('/project')
+def update_project(profile: Optional[str] = None):
     """
-    AWX project update 동작 한번에 처리
-    Retuen response_class HTTP status code로 지정하는 방법 고민 좀
+    AWX project update 동작을 수행
+    profile 값이 없을 경우, 모든 환경의 기본 프로젝트 업데이트
     """
-    endpoints: str = ["/api/v2/projects/", "/update/"]
-    oauth2_token = "lXhCWAnf9cVIw67JJlex4PZL2PmMjz"
+    ret = None
+    regions = ['dev', 'qa', 'stg', 'prod']
 
-    # awx project index
-    index = str(8)
+    if profile is None:
+        for item in regions:
+            ret = update_awx_project(item)
+            # Error Handling
+            if ret.status_code != status.HTTP_202_ACCEPTED:
+                raise HTTPException(status_code=ret.status_code, detail="")
 
-    awx_url = AWX_URL_TUPLE[0] + endpoints[0] + index + endpoints[1]
-    sess = requests.session()
+    else:
+        profile = profile.lower()
+        ret = update_awx_project(profile)
 
-    print(f'{awx_url}')
-    ret = sess.get(AWX_URL_TUPLE[0] + "/api/login")
+    if ret.status_code != status.HTTP_202_ACCEPTED:
+        raise HTTPException(status_code=ret.status_code, detail="Not founded AWX Project")
 
-    headers = {
-        'Authorization': 'Bearer ' + oauth2_token,
-        'content-type': 'application/json'
-    }
-    r = sess.post(awx_url, headers=headers)
-    print(r)
-    print(f"{r.status_code}\n {r.headers}\n {r.cookies}")
-    return ret
+    return {"ret": ret.status_code}
+
+
+@router.patch('/project/{project_idx}', status_code=status.HTTP_202_ACCEPTED)
+async def update_specific_project(profile: str, project_idx):
+    """
+    Pre-defined project가 아닌 특정 index의 프로젝트를 업데이트할 때 사용합니다.
+    """
+    ret = update_awx_project(profile, project_idx)
+    if ret.status_code != status.HTTP_202_ACCEPTED:
+        raise HTTPException(status_code=ret.status_code, detail="Not founded AWX Project")
+
+    return {"ret": ret.status_code}

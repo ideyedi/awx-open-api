@@ -1,10 +1,11 @@
 import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.config import Settings
 from app.routers import (awx,
                          )
-from app.config import Settings
 from app.ver import __version__ as version
 
 logging.basicConfig(level=logging.INFO)
