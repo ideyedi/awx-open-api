@@ -1,4 +1,4 @@
-from .jenkins import JenkinsAgent, JenkinsJobParams
+from app.services.jenkins import JenkinsAgent, JenkinsJobParams
 
 agent = JenkinsAgent()
 

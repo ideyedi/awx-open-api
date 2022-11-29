@@ -2,11 +2,11 @@ import re
 import logging
 from fastapi.testclient import TestClient
 
-from ..main import app
-from ..services.bitbucket import WebHook
-from ..services.jenkins import JenkinsAgent
-from ..services.argocd import Argocd
-from ..models.params import (
+from app.main import app
+from app.services.bitbucket import WebHook
+from app.services.jenkins import JenkinsAgent
+from app.services.argocd import Argocd
+from app.models.params import (
     DISPOSABLE_WEBHOOK_PREFIX,
     BitbucketMergeEventPayload,
     BitbucketMergeEventPayloadRef,

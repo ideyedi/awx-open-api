@@ -1,6 +1,6 @@
 import logging
-from .harbor import Harbor
-from ..models.params import (
+from app.services.harbor import Harbor
+from app.models.params import (
     HarborProjectReq,
     HarborUserEntity,
     HARBOR_ROLE_MAP,

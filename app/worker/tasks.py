@@ -1,6 +1,9 @@
 import time
+
 from celery import Celery
+
 from .awx import AnsibleCrawler
+
 celery = Celery('task',
                 broker='redis://localhost:6379/0',
                 backend='redis://localhost:6379/0'
@@ -21,7 +24,3 @@ def make_sourced_inventory(app_name, profile, project):
     ret = crawler.make_inventory()
 
     return ret
-
-
-if __name__ == "__main__":
-    print(f'Test Code')

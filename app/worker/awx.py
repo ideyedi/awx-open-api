@@ -1,15 +1,12 @@
+import logging
 import time
 import traceback
+
 import requests
-import logging
-
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-
-from selenium.webdriver.support.ui import Select
 from selenium.webdriver.chrome.service import Service
-
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import Select
 from webdriver_manager.chrome import ChromeDriverManager
 
 
@@ -24,6 +21,14 @@ class AnsibleCrawler:
             self.target_url = "http://awx.wemakeprice.kr"
             self.inventory_index = 1
             self.host_filter = "[A-Za-z]+\d+\w+.(?!dev|qa|stg)[a-z]."
+        elif profile == "qa":
+            self.target_url = "http://awx-qa.wemakeprice.kr"
+            self.inventory_index = 1
+            self.host_filter = "[A-Za-z]+\d+\w+.qa."
+        elif profile == "stg":
+            self.target_url = "http://awx-stg.wemakeprice.kr"
+            self.inventory_index = 2
+            self.host_filter = "[A-Za-z]+\d+\w+.stg."
         else:
             self.target_url = "http://awx-dev.wemakeprice.kr"
             self.inventory_index = 2
