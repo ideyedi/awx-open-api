@@ -1,20 +1,25 @@
-import requests
-import logger
-from app.config import (AWX_URL_TUPLE,
-                        )
+import logging
+from typing import Optional
 
-from fastapi import APIRouter, status
-from fastapi.responses import (PlainTextResponse,
-                               )
-from app.worker.tasks import (make_sourced_inventory,
-                              )
-from app.errors import (raise_error,
-                        )
+from fastapi import (APIRouter,
+                     status,
+                     HTTPException,
+                     )
+
+from app.worker.tasks import make_sourced_inventory
+from app.services.awx import update_awx_project
 
 router = APIRouter(prefix="/awx", tags=["awx"])
 
+"""
+@router.post('/unittest/sync/source')
+def test(app_name="nd-sre-api", profile="dev", project="develop"):
+    task = make_sourced_inventory(app_name, profile, project)
+    print(f' Sync api result: {task}')
+    return JSONResponse(content=task)
+"""
 
-@router.post('/inventory/source', response_class=PlainTextResponse)
+@router.post('/inventory/source')
 def make_source(app_name: str, profile: str, project: str):
     """
     Async task to make source inventory
@@ -22,45 +27,44 @@ def make_source(app_name: str, profile: str, project: str):
     @param profile: profile name, (e.g. dev, qa, stg, prod)
     @param project: Ansible AWX project name
     """
-    task = make_sourced_inventory.delay(app_name, profile, project)
-    print(f' Async object: task {task}')
+    task_hash = make_sourced_inventory.delay(app_name, profile, project)
+    logging.INFO(task_hash)
+    return task_hash
 
-    return "OK"
 
-
-@router.post('/unittest/sync/source')
-def test(app_name="nd-sre-api", profile="dev", project="develop"):
+@router.patch('/project', status_code=status.HTTP_202_ACCEPTED)
+def update_project(profile: Optional[str] = None):
     """
-    Syncronize 동작을 확인하기 위한 테스트 함수
+    AWX project update 동작을 수행
+    profile 값이 없을 경우, 모든 환경의 기본 프로젝트 업데이트
     """
-    task = make_sourced_inventory(app_name, profile, project)
-    print(f' Sync api result: {task}')
-    return True
+    ret = None
+    regions = ['dev', 'qa', 'stg', 'prod']
+
+    if profile is None:
+        for item in regions:
+            ret = update_awx_project(item)
+            # Error Handling
+            if ret.status_code != status.HTTP_202_ACCEPTED:
+                raise HTTPException(status_code=ret.status_code, detail="")
+
+    else:
+        profile = profile.lower()
+        ret = update_awx_project(profile)
+
+    if ret.status_code != status.HTTP_202_ACCEPTED:
+        raise HTTPException(status_code=ret.status_code, detail="Not founded AWX Project")
+
+    return {"ret": ret.status_code}
 
 
-@router.post('/project/update')
-def update_project():
+@router.patch('/project/{project_idx}', status_code=status.HTTP_202_ACCEPTED)
+async def update_specific_project(profile: str, project_idx):
     """
-    AWX project update 동작 한번에 처리
-    Retuen response_class HTTP status code로 지정하는 방법 고민 좀
+    Pre-defined project가 아닌 특정 index의 프로젝트를 업데이트할 때 사용합니다.
     """
-    endpoints: str = ["/api/v2/projects/", "/update/"]
-    oauth2_token = "lXhCWAnf9cVIw67JJlex4PZL2PmMjz"
+    ret = update_awx_project(profile, project_idx)
+    if ret.status_code != status.HTTP_202_ACCEPTED:
+        raise HTTPException(status_code=ret.status_code, detail="Not founded AWX Project")
 
-    # awx project index
-    index = str(8)
-
-    awx_url = AWX_URL_TUPLE[0] + endpoints[0] + index + endpoints[1]
-    sess = requests.session()
-
-    print(f'{awx_url}')
-    ret = sess.get(AWX_URL_TUPLE[0] + "/api/login")
-
-    headers = {
-        'Authorization': 'Bearer ' + oauth2_token,
-        'content-type': 'application/json'
-    }
-    r = sess.post(awx_url, headers=headers)
-    print(r)
-    print(f"{r.status_code}\n {r.headers}\n {r.cookies}")
-    return ret
+    return {"ret": ret.status_code}

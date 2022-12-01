@@ -1,6 +1,12 @@
 from fastapi import HTTPException
 
 
+class AWXLoginFailException(Exception):
+    """
+    Ansible AWX 로그인 실패할 경우 예외 처리
+    """
+    pass
+
 class PoolNotFoundException(Exception):
     pass
 

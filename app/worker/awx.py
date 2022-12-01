@@ -1,15 +1,22 @@
+import logging
 import time
 import traceback
 import requests
-import logging
 
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-
-from selenium.webdriver.support.ui import Select
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import Select
 from webdriver_manager.chrome import ChromeDriverManager
+
+from app.config import (AWX_URLS,
+                        AWX_INVENTORY_IDX,
+                        AWX_HOST_FILTER,
+                        CHROME_OPTION,
+                        )
+from app.errors import AWXLoginFailException
+
+logging.basicConfig()
 
 
 class AnsibleCrawler:
@@ -18,37 +25,18 @@ class AnsibleCrawler:
         self.profile = profile
         self.project = project
 
+        # profile 값만 한번 체크
+
         # profile 값에 따라 AWX 서버 정보 변경
-        if profile == "prod":
-            self.target_url = "http://awx.wemakeprice.kr"
-            self.inventory_index = 1
-            self.host_filter = "[A-Za-z]+\d+\w+.(?!dev|qa|stg)[a-z]."
-        elif profile == "qa":
-            self.target_url = "http://awx-qa.wemakeprice.kr"
-            self.inventory_index = 1
-            self.host_filter = "[A-Za-z]+\d+\w+.qa."
-        elif profile == "stg":
-            self.target_url = "http://awx-stg.wemakeprice.kr"
-            self.inventory_index = 2
-            self.host_filter = "[A-Za-z]+\d+\w+.stg."
-        else:
-            self.target_url = "http://awx-dev.wemakeprice.kr"
-            self.inventory_index = 2
-            self.host_filter = "[A-Za-z]+\d+\w+.dev."
+        self.target_url = AWX_URLS[profile]
+        self.inventory_index = AWX_INVENTORY_IDX[profile]
+        self.host_filter = AWX_HOST_FILTER[profile]
 
         chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_argument("--incognito")
-        chrome_options.add_argument("--headless")
-        # DevToolsActivePort file doesn't exist error
-        chrome_options.add_argument("--no-sandbox")
-        """
-        input tag에 키워드 전달 시 창 크기 정의가 없는 경우 상호 작용이 안될수 있음
-        """
-        chrome_options.add_argument("--window-size=1920,1080")
 
-        # webdriver manager v3.8.3 bugfix됨에 따라서 하드 코딩 제거
-        # self.driver = webdriver.Chrome(service=Service(ChromeDriverManager(version="105.0.5195.52").install()),
-        #                               options=chrome_options)
+        for item in CHROME_OPTION:
+            chrome_options.add_argument(item)
+
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()),
                                        options=chrome_options)
         self.headers = {
@@ -67,7 +55,7 @@ class AnsibleCrawler:
         @ AWX login process
         """
         awx_id = 'jenkins'
-        awx_pw = 'dlswmd.!'
+        awx_pw = 'dlswmd_1'
         id_tag = self.driver.find_elements(By.ID, 'pf-login-username-id')
         pw_tag = self.driver.find_elements(By.ID, 'pf-login-password-id')
         login_btn = self.driver.find_elements(By.CLASS_NAME, 'pf-c-button')
@@ -79,15 +67,19 @@ class AnsibleCrawler:
         # Wait loading time
         time.sleep(1)
 
+        # Login page에는 없는 css class를 이용해서 예외 처리
+        check_tag = self.driver.find_elements(By.CLASS_NAME, "pf-c-page__main")
+        if not check_tag:
+            raise AWXLoginFailException
+
         self.driver.get(self.target_url + '/#/inventories/inventory/' + str(self.inventory_index) + '/sources/add')
-        pass
 
     def make_inventory(self):
         """
         wemakeprice ansible inventory making
-        :return:
+        :return: Boolean
         """
-        ret = 0
+        ret_inventory = True
 
         try:
             print(f'Login process')
@@ -175,11 +167,23 @@ class AnsibleCrawler:
             btn_sync = btns_sync[1]
             btn_sync.click()
 
-        except Exception:
-            traceback.print_exc()
-            ret = -1
+        except AWXLoginFailException:
+            logging.error(AWXLoginFailException, exc_info=True)
+            ret_inventory = False
+
+        except Exception as e:
+            traceback.print_exc(e)
+            print(f"Error: {e}")
+            ret_inventory = False
 
         finally:
             self.driver.quit()
             print('Quit crawling')
-            return ret
+            return ret_inventory
+
+
+if __name__ == "__main__":
+    crawler = AnsibleCrawler("nd-sre-api", "dev", "develop")
+    crawler.driver.get(crawler.target_url)
+    time.sleep(1)
+    ret = crawler.make_inventory()
