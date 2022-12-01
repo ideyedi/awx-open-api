@@ -1,4 +1,11 @@
+<<<<<<< HEAD
 from pydantic import BaseSettings
+=======
+from pydantic import (BaseSettings,
+                      BaseModel,
+                      )
+
+>>>>>>> 59b144e169f077cadef673161dcf97775c1f0a10
 from typing_extensions import Literal
 
 REGIONS = Literal["dev", "qa", "stg", "prod"]
@@ -53,6 +60,71 @@ CHROME_OPTION = [
     "--window-size=1920,1080"
 ]
 
+<<<<<<< HEAD
+=======
+ENV_BRANCH_MAP = {
+    "dev": "develop",
+    "qa": "release/qa",
+    "stg": "release/stg",
+    "prod": "master",
+    # fallback
+    "develop": "develop",
+    "development": "develop",
+    "staging": "release/stg",
+    "production": "master",
+}
+
+ENV_TAG_MAP = {
+    "dev": "develop",
+    "qa": "qa",
+    "stg": "stg",
+    "prod": "prod",
+}
+
+ARGOCD_TARGET_REVISION_BY_REGION = {
+    "dev": "develop",
+    "qa": "release/qa",
+    "stg": "release/stg",
+    "prod": "master",
+}
+
+BIGIP_ENV_BY_ENV_MAP = {
+    "dev": "development",
+    "qa": "qa",
+    "stg": "staging",
+    "prod": "production",
+    # fallback
+    "staging": "staging",
+}
+
+WREGISTRY = "wregistry.wemakeprice.com"
+WREGISTRY_SECRET_NAME = "wregistry"
+DEV_INFRACM_REGISTRY = "devinfracmconreg.azurecr.io"
+DEV_INFRACM_REGISTRY_SECRET_NAME = "devinfracmconreg"
+
+AWX_URLS = {
+    "dev": "http://awx-dev.wemakeprice.kr",
+    "qa": "http://awx-qa.wemakeprice.kr",
+    "stg": "http://awx-stg.wemakeprice.kr",
+    "prod": "http://awx.wemakeprice.kr",
+}
+
+# AWX 'jenkins' Token expires time '3/31/3022'..
+OAUTH2_TOKENS = {
+    "dev": "lXhCWAnf9cVIw67JJlex4PZL2PmMjz",
+    "qa": "zI6di0MBYg7FUnpF7W7S9GGhYKoQNL",
+    "stg": "3E0QQJTVxGIKf8J4B9cBrWrOfmQIoW",
+    "prod": "GAIoEoNzHbhHIuqeNNmhNkpV8AB4PF",
+}
+
+AWX_PROJECT_IDX = {
+    "dev": 8,
+    "qa": 6,
+    "stg": 8,
+    "prod": 6,
+}
+
+>>>>>>> 59b144e169f077cadef673161dcf97775c1f0a10
 tags_metadata = [
     {
         "name": "awx",

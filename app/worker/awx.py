@@ -1,8 +1,12 @@
 import logging
 import time
 import traceback
-import requests
 
+import requests
+<<<<<<< HEAD
+
+=======
+>>>>>>> 59b144e169f077cadef673161dcf97775c1f0a10
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
