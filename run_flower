@@ -1,0 +1,2 @@
+#!/bin/sh
+celery -A app.worker.tasks flower --port=8888
