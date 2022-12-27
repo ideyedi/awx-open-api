@@ -50,9 +50,8 @@ def update_awx_project(profile: str, index: Optional[int] = None):
 
 def search_project_idx(profile, awx_project):
     """
-    Searching to project index number using name
+    Search by project index number using name
     """
-    idx = 0
     sess = requests.session()
 
     awx_info = AwxInfo(profile=profile,
@@ -78,11 +77,39 @@ def search_project_idx(profile, awx_project):
     return idx
 
 
+def search_source_inventory(profile, app_name):
+    """
+    Search by source inventory index number using application name
+    """
+    endpoint = "/api/v2/inventory_sources?search=" + app_name
+    awx_info = AwxInfo(profile=profile,
+                       url=AWX_URLS[profile],
+                       token=OAUTH2_TOKENS[profile],
+                       project_idx=AWX_PROJECT_IDX[profile])
+    headers = {
+        'Authorization': 'Bearer ' + awx_info.token,
+        'content-type': 'application/json'
+    }
+
+    with requests.session() as sess:
+        response = sess.get(awx_info.url + endpoint, headers=headers)
+        cnt = response.json().get('count')
+        infos = response.json().get('results')
+
+        if cnt == 0:
+            print(f"Not founded sourced inventory {app_name}")
+            raise AWXProjectNotFoundException
+
+        idx = infos[0].get("id", 0)
+
+    return idx
+
+
 def create_awx_inventory_sources(app_name, profile, project):
     """
     Create inventory sources using AWX OpenAPI
     """
-    endpoints: str = ["/api/v2/inventories/", "/inventory_sources/", "/update_inventory_sources/"]
+    endpoints: str = ["/api/v2/inventories/", "/inventory_sources/", "/update/"]
     sess = requests.session()
 
     awx_info = AwxInfo(profile=profile,
@@ -100,7 +127,6 @@ def create_awx_inventory_sources(app_name, profile, project):
     idx = search_project_idx(profile=profile, awx_project=project)
     datas = {
         "name": app_name,
-        "overwrite_vars": True,
         "source": "scm",
         "overwrite": True,
         "overwrite_var": True,
@@ -110,12 +136,45 @@ def create_awx_inventory_sources(app_name, profile, project):
     }
     r = sess.post(req_address, headers=headers, data=json.dumps(datas))
     if r.status_code != status.HTTP_201_CREATED:
+        print(r.json())
         raise AWXProjectNotCreatedException
 
     created_idx = r.json().get('id')
-    req_address = awx_info.url + endpoints[0] + str(AWX_INVENTORY_IDX[profile]) + endpoints[2]
+    req_address = awx_info.url + "/api/v2" + endpoints[1] + str(created_idx) + endpoints[2]
     print(req_address)
-    r = sess.post(req_address, headers=headers)
+    r = sess.get(req_address, headers=headers)
     print(r.json())
+    r = sess.post(req_address, headers=headers)
+    print(r.reason)
+
     return r
 
+
+def change_awx_sourced_inventory_branch(profile, idx):
+    """
+    Sourced inventory branch parameter 변경
+    """
+    endpoints = "/api/v2/inventory_sources/"
+    awx_info = AwxInfo(profile=profile,
+                       url=AWX_URLS[profile],
+                       token=OAUTH2_TOKENS[profile],
+                       project_idx=AWX_PROJECT_IDX[profile])
+    headers = {
+        'Authorization': 'Bearer ' + awx_info.token,
+        'content-type': 'application/json'
+    }
+
+    datas = {
+        "source_project": awx_info.project_idx
+    }
+
+    with requests.Session() as sess:
+        # Change branch value to profile default branch
+        r = sess.patch(awx_info.url + endpoints + str(idx) + '/', headers=headers, data=json.dumps(datas))
+        print(r.status_code)
+        # Synchronizing sourced project
+        address = awx_info.url + "/api/v2/inventory_sources/" + str(idx) + "/update/"
+        r = sess.post(address, headers=headers)
+        print(r.status_code)
+
+    return r

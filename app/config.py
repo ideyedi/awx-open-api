@@ -67,7 +67,7 @@ class Settings(BaseSettings):
     infra-DevOps 메일링 주소..
     OpenAPI tags는 타입 명시를 뭐로 해야하지..
     """
-    app_name: str = "sre-crawler-api"
+    app_name: str = "sre-api"
     admin_email: str = "wmporg_distribution@wemakeprice.com"
     app_description: str = "WeMakePrice SRE Automation restful API"
     app_version: str
