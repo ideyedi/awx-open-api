@@ -1,49 +1,45 @@
-import requests
-import logger
-
 from typing import Optional
-from app.config import (AWX_URLS,
-                        OAUTH2_TOKENS,
-                        AWX_PROJECT_IDX,
-                        )
-from app.models.awx import AwxInfo
 
 from fastapi import (APIRouter,
                      status,
                      HTTPException,
                      )
-from fastapi.responses import PlainTextResponse
-from app.worker.tasks import make_sourced_inventory
-from app.services.awx import update_awx_project
 
+import app.services.awx as awx
 router = APIRouter(prefix="/awx", tags=["awx"])
 
 
-@router.post('/inventory/source', response_class=PlainTextResponse)
-def make_source(app_name: str, profile: str, project: str):
+@router.post('/inventory/source', status_code=status.HTTP_201_CREATED)
+def create_sourced_inventory(app_name: str, profile: str, project: str):
     """
-    Async task to make source inventory
-    @param app_name: service application name
-    @param profile: profile name, (e.g. dev, qa, stg, prod)
-    @param project: Ansible AWX project name
+    Create AWX Sourced inventory
+    @param app_name: 생성하고자 하는 어플리케이션 이름
+    @param profile: 서비스 프로파일, (e.g. dev, qa, stg, prod)
+    @param project: Ansible AWX의 프로젝트
     """
-    task = make_sourced_inventory.delay(app_name, profile, project)
-    print(f' Async object: task {task}')
+    app_name = app_name.lower()
+    profile = profile.lower()
+    project = project.lower()
+    ret = awx.create_awx_inventory_sources(app_name, profile, project)
 
-    return "OK"
+    return {"result": ret.status_code}
 
 
-#@router.post('/unittest/sync/source')
-def test(app_name="nd-sre-api", profile="dev", project="develop"):
+@router.patch('/inventory/source', status_code=status.HTTP_200_OK)
+def change_sourced_inventory_branch(profile: Optional[str] = None, app_name=""):
     """
-    Syncronize 동작을 확인하기 위한 테스트 함수
+    Application name (sourced inventory name)을 기준으로 해당 인덱스를 찾아
+    머지 프로젝트로 브랜치를 변경하는 함수
     """
-    task = make_sourced_inventory(app_name, profile, project)
-    print(f' Sync api result: {task}')
-    return True
+    idx = awx.search_source_inventory(profile=profile, app_name=app_name)
+    print(f"project idx: {idx}")
+    ret = awx.change_awx_sourced_inventory_branch(profile, idx)
+    print(f"r: {ret.json()}")
+
+    return {"result": ret.status_code}
 
 
-@router.patch('/project')
+@router.patch('/project', status_code=status.HTTP_202_ACCEPTED)
 def update_project(profile: Optional[str] = None):
     """
     AWX project update 동작을 수행
@@ -54,28 +50,30 @@ def update_project(profile: Optional[str] = None):
 
     if profile is None:
         for item in regions:
-            ret = update_awx_project(item)
-            # Error Handling
+            ret = awx.update_awx_project(item)
             if ret.status_code != status.HTTP_202_ACCEPTED:
                 raise HTTPException(status_code=ret.status_code, detail="")
 
     else:
         profile = profile.lower()
-        ret = update_awx_project(profile)
+        ret = awx.update_awx_project(profile)
 
+    # Error Handling
     if ret.status_code != status.HTTP_202_ACCEPTED:
         raise HTTPException(status_code=ret.status_code, detail="Not founded AWX Project")
 
     return {"ret": ret.status_code}
 
 
-@router.patch('/project/{project_idx}', status_code=status.HTTP_202_ACCEPTED)
-async def update_specific_project(profile: str, project_idx):
+@router.patch('/project/{project}', status_code=status.HTTP_202_ACCEPTED)
+async def update_specific_project(profile: str, project):
     """
-    Pre-defined project가 아닌 특정 index의 프로젝트를 업데이트할 때 사용합니다.
+    Pre-defined project가 아닌 특정 AWX 프로젝트를 업데이트
     """
-    ret = update_awx_project(profile, project_idx)
+    project_idx = awx.search_project_idx(profile=profile, awx_project=project)
+    ret = awx.update_awx_project(profile, project_idx)
     if ret.status_code != status.HTTP_202_ACCEPTED:
         raise HTTPException(status_code=ret.status_code, detail="Not founded AWX Project")
 
     return {"ret": ret.status_code}
+
